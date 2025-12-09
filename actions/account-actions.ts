@@ -2,10 +2,15 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 export async function getAccounts() {
+    const session = await auth();
+    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
     try {
-        const accounts = await prisma.account.findMany({
+        const accounts = await prisma.tradingAccount.findMany({
+            where: { userId: session.user.id },
             orderBy: { createdAt: 'desc' }
         });
         return { success: true, data: accounts };
@@ -21,13 +26,17 @@ export async function createAccount(data: {
     type: string;
     firm?: string;
 }) {
+    const session = await auth();
+    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
     try {
-        const account = await prisma.account.create({
+        const account = await prisma.tradingAccount.create({
             data: {
                 name: data.name,
                 balance: data.balance,
                 type: data.type,
                 firm: data.firm,
+                userId: session.user.id,
             },
         });
         revalidatePath("/accounts");
@@ -39,8 +48,18 @@ export async function createAccount(data: {
 }
 
 export async function deleteAccount(id: string) {
+    const session = await auth();
+    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
     try {
-        await prisma.account.delete({
+        // Verificar propiedad antes de borrar
+        const account = await prisma.tradingAccount.findFirst({
+            where: { id, userId: session.user.id }
+        });
+
+        if (!account) return { success: false, error: "Account not found or unauthorized" };
+
+        await prisma.tradingAccount.delete({
             where: { id },
         });
         revalidatePath("/accounts");

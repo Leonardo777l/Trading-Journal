@@ -2,12 +2,17 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 export async function getTrades() {
+    const session = await auth();
+    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
     try {
         const trades = await prisma.trade.findMany({
+            where: { userId: session.user.id },
             orderBy: { date: 'desc' },
-            include: { account: true } // Incluir datos de la cuenta si es necesario
+            include: { account: true }
         });
         return { success: true, data: trades };
     } catch (error) {
@@ -17,29 +22,25 @@ export async function getTrades() {
 }
 
 export async function createTrade(data: any) {
-    try {
-        // Buscar la cuenta por nombre para obtener su ID (temporal, idealmente el form debería enviar el ID)
-        // Como el form actual envía el nombre de la cuenta, necesitamos resolverlo.
-        // O mejor, actualizaremos el form para enviar el ID.
-        // Por ahora, buscaremos la cuenta por nombre para mantener compatibilidad rápida.
+    const session = await auth();
+    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
+    try {
         let accountId = data.accountId;
 
         if (!accountId && data.account) {
-            const account = await prisma.account.findFirst({
-                where: { name: data.account }
+            const account = await prisma.tradingAccount.findFirst({
+                where: { name: data.account, userId: session.user.id }
             });
             if (account) {
                 accountId = account.id;
             } else {
-                // Si no existe la cuenta (ej. TESTING por defecto), creamos una o usamos una default?
-                // Mejor fallar o crear una dummy.
-                // Vamos a crear una cuenta dummy si no existe para evitar errores.
-                const newAccount = await prisma.account.create({
+                const newAccount = await prisma.tradingAccount.create({
                     data: {
                         name: data.account,
                         balance: 10000,
-                        type: "Personal"
+                        type: "Personal",
+                        userId: session.user.id
                     }
                 });
                 accountId = newAccount.id;
@@ -61,6 +62,7 @@ export async function createTrade(data: any) {
                 notes: data.notes,
                 screenshotUrl: data.screenshotUrl,
                 accountId: accountId,
+                userId: session.user.id
             },
         });
         revalidatePath("/journal");
@@ -73,7 +75,15 @@ export async function createTrade(data: any) {
 }
 
 export async function deleteTrade(id: string) {
+    const session = await auth();
+    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
     try {
+        const trade = await prisma.trade.findFirst({
+            where: { id, userId: session.user.id }
+        });
+        if (!trade) return { success: false, error: "Trade not found or unauthorized" };
+
         await prisma.trade.delete({
             where: { id },
         });

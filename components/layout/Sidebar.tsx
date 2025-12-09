@@ -4,6 +4,7 @@ import { LayoutDashboard, PlusCircle, BookOpen, Settings, BarChart3, Wallet, Cli
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { UserMenu } from "@/components/auth/UserMenu";
 
 export function Sidebar() {
     const pathname = usePathname();
@@ -25,8 +26,9 @@ export function Sidebar() {
                 <NavItem href="/entry" icon={<PlusCircle className="w-5 h-5" />} label="Nueva Entrada" active={pathname === "/entry"} />
             </nav>
 
-            <div className="p-4 border-t border-white/5">
+            <div className="p-4 border-t border-white/5 space-y-4">
                 <NavItem href="/settings" icon={<Settings className="w-5 h-5" />} label="Configuración" active={pathname === "/settings"} />
+                <UserMenu />
             </div>
         </aside>
     );
