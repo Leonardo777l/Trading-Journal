@@ -62,7 +62,15 @@ export async function createTrade(data: any) {
                 notes: data.notes,
                 screenshotUrl: data.screenshotUrl,
                 accountId: accountId,
-                userId: session.user.id
+                userId: session.user.id,
+                // New Fields
+                entryPrice: data.entryPrice ? Number(data.entryPrice) : null,
+                exitPrice: data.exitPrice ? Number(data.exitPrice) : null,
+                lotSize: data.lotSize ? Number(data.lotSize) : null,
+                pips: data.pips ? Number(data.pips) : null,
+                commission: data.commission ? Number(data.commission) : null,
+                extraFees: data.extraFees ? Number(data.extraFees) : null,
+                exitReason: data.exitReason,
             },
         });
         revalidatePath("/journal");

@@ -88,6 +88,14 @@ model Trade {
   date         DateTime
   pair         String
   direction    String
+  entryPrice   Float?
+  exitPrice    Float?
+  lotSize      Float?
+  pips         Float?
+  commission   Float?
+  extraFees    Float?  // Swap, etc.
+  exitReason   String? // TP, SL, BE, Manual
+  
   entrySizeUSD Float
   risk         Float
   pnl          Float

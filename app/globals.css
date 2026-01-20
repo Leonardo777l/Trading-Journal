@@ -1,38 +1,77 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050505;
-  --foreground: #ededed;
-  
-  /* Neon Colors */
-  --neon-green: #00FF41;
-  --neon-red: #FF003C;
-  --neon-blue: #00F0FF;
-  --neon-purple: #BC13FE;
-  
-  /* Glassmorphism */
+  --background: #000000;
+  --foreground: #ffffff;
+
+  /* Premium Neon Palette */
+  --neon-green: #29FFA6;
+  /* More electric mint */
+  --neon-red: #FF2E63;
+  /* Punchy red */
+  --neon-blue: #00E0FF;
+  /* Tron blue */
+  --neon-purple: #B026FF;
+  /* Deep electric purple */
+  --neon-accent: #FFD700;
+  /* Gold for premium touches */
+
+  /* Glassmorphism System */
   --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.15);
+
+  /* Deep Space Gradient */
+  --bg-gradient: radial-gradient(circle at 50% -20%, #1a1f35 0%, #050505 45%, #000000 100%);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
+
   --color-neon-green: var(--neon-green);
   --color-neon-red: var(--neon-red);
   --color-neon-blue: var(--neon-blue);
   --color-neon-purple: var(--neon-purple);
-  
+  --color-neon-accent: var(--neon-accent);
+
   --color-glass-bg: var(--glass-bg);
   --color-glass-border: var(--glass-border);
+  --color-glass-highlight: var(--glass-highlight);
 
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
+
+  --shadow-neon-blue: 0 0 20px rgba(0, 224, 255, 0.3);
+  --shadow-neon-green: 0 0 20px rgba(41, 255, 166, 0.3);
 }
 
 body {
-  background: var(--background);
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  /* Parallax-like feel */
   color: var(--foreground);
   font-family: var(--font-sans);
+  min-height: 100vh;
+  /* Fix for font smoothing */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }

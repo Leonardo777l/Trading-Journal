@@ -10,13 +10,20 @@ export interface Trade {
     entryPrice?: number | null;
     exitPrice?: number | null;
     stopLoss?: number | null;
-    positionSize?: number | null;
+    takeProfit?: number | null;
+    lotSize?: number | null;
+    pips?: number | null;
+    commission?: number | null;
+    extraFees?: number | null;
+    exitReason?: string | null; // TP, SL, BE, Manual
+
     entrySizeUSD: number;
     result: 'Win' | 'Loss' | 'Breakeven';
     pnl: number;
     risk: number;
     roi: number;
     account: string;
+    accountId?: string; // Add ID for filtering
     rr: number;
     tags: string[];
     screenshotUrl?: string | null;
@@ -35,8 +42,12 @@ interface TradeStore {
     trades: Trade[];
     accounts: Account[];
     isLoading: boolean;
+    baseAccountSize: number;
+    selectedAccountId: string | "ALL";
 
     // Actions
+    setBaseAccountSize: (size: number) => void;
+    setSelectedAccountId: (id: string | "ALL") => void;
     fetchInitialData: () => Promise<void>;
     addTrade: (trade: any) => Promise<void>;
     addAccount: (account: any) => Promise<void>;
@@ -47,6 +58,11 @@ export const useTradeStore = create<TradeStore>((set, get) => ({
     trades: [],
     accounts: [],
     isLoading: false,
+    baseAccountSize: 10000,
+    selectedAccountId: "ALL",
+
+    setBaseAccountSize: (size: number) => set({ baseAccountSize: size }),
+    setSelectedAccountId: (id: string | "ALL") => set({ selectedAccountId: id }),
 
     fetchInitialData: async () => {
         set({ isLoading: true });
@@ -57,15 +73,22 @@ export const useTradeStore = create<TradeStore>((set, get) => ({
             ]);
 
             if (tradesRes.success && tradesRes.data) {
-                // Mapear datos de DB a interfaz Trade (fechas vienen como Date, necesitamos string o manejar Date)
-                // Ajustaremos la interfaz para manejar strings en el frontend por simplicidad con JSON
                 const formattedTrades = tradesRes.data.map((t: any) => ({
                     ...t,
                     date: t.date.toISOString(),
                     direction: t.direction as 'Long' | 'Short',
                     result: t.result as 'Win' | 'Loss' | 'Breakeven',
                     tags: t.tags ? t.tags.split(',') : [],
-                    account: t.account?.name || 'Unknown' // Mapear nombre de cuenta para compatibilidad UI
+                    account: t.account?.name || 'Unknown',
+                    accountId: t.accountId, // Map ID
+                    // Map new fields safely
+                    entryPrice: t.entryPrice,
+                    exitPrice: t.exitPrice,
+                    lotSize: t.lotSize,
+                    pips: t.pips,
+                    commission: t.commission,
+                    extraFees: t.extraFees,
+                    exitReason: t.exitReason
                 }));
                 set({ trades: formattedTrades });
             }
@@ -81,11 +104,8 @@ export const useTradeStore = create<TradeStore>((set, get) => ({
     },
 
     addTrade: async (tradeData) => {
-        // Optimistic update (opcional) o esperar respuesta
         const res = await createTrade(tradeData);
         if (res.success && res.data) {
-            // Recargar todo para asegurar consistencia o añadir manualmente
-            // Por simplicidad, añadimos al estado local formateado
             const t = res.data;
             const newTrade: Trade = {
                 ...t,
@@ -93,7 +113,15 @@ export const useTradeStore = create<TradeStore>((set, get) => ({
                 direction: t.direction as 'Long' | 'Short',
                 result: t.result as 'Win' | 'Loss' | 'Breakeven',
                 tags: t.tags ? t.tags.split(',') : [],
-                account: tradeData.account // Nombre de cuenta preservado del input
+                account: tradeData.account,
+                accountId: t.accountId, // Map ID
+                entryPrice: t.entryPrice,
+                exitPrice: t.exitPrice,
+                lotSize: t.lotSize,
+                pips: t.pips,
+                commission: t.commission,
+                extraFees: t.extraFees,
+                exitReason: t.exitReason
             };
             set((state) => ({ trades: [newTrade, ...state.trades] }));
         }

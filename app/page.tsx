@@ -1,4 +1,6 @@
+import { DashboardControls } from "@/components/dashboard/DashboardControls";
 import { StatsCards } from "@/components/dashboard/StatsCards";
+import { AIAnalyst } from "@/components/dashboard/AIAnalyst";
 import { EquityChart } from "@/components/dashboard/EquityChart";
 import { DailyPnLChart } from "@/components/dashboard/DailyPnLChart";
 import { TradingCalendar } from "@/components/dashboard/TradingCalendar";
@@ -13,7 +15,12 @@ export default function Home() {
         <p className="text-white/50 mt-2">Aquí tienes el resumen de tu portafolio hoy.</p>
       </header>
 
+      <DashboardControls />
       <StatsCards />
+
+      <div className="mb-8">
+        <AIAnalyst />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
