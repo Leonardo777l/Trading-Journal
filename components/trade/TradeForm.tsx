@@ -104,7 +104,7 @@ export function TradeForm() {
         setShowCalculator(false);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const newTrade = {
@@ -128,9 +128,18 @@ export function TradeForm() {
             result: calculations.result as "Win" | "Loss" | "Breakeven",
         };
 
-        addTrade(newTrade);
-        // Reset form optional?
-        alert("¡Operación registrada con éxito!");
+        try {
+            const result = await addTrade(newTrade);
+            if (result.success) {
+                alert("¡Operación registrada con éxito!");
+                // Optional: Reset form here
+            } else {
+                alert(`Error al guardar: ${result.error || "Error desconocido"}`);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error inesperado al intentar guardar.");
+        }
     };
 
     return (

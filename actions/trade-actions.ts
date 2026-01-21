@@ -4,25 +4,26 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 
-export async function getTrades() {
-    const session = await auth();
-    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+const session = await auth();
+if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
-    try {
-        const trades = await prisma.trade.findMany({
-            where: { userId: session.user.id },
-            orderBy: { date: 'desc' },
-            include: { account: true }
-        });
-        return { success: true, data: trades };
-    } catch (error) {
-        console.error("Error fetching trades:", error);
-        return { success: false, error: "Failed to fetch trades" };
-    }
+try {
+    const trades = await prisma.trade.findMany({
+        where: { userId: session.user.id },
+        orderBy: { date: 'desc' },
+        include: { account: true }
+    });
+    return { success: true, data: trades };
+} catch (error) {
+    console.error("Error fetching trades:", error);
+    logToDebugFile(`Error fetching trades: ${String(error)}`);
+    return { success: false, error: "Failed to fetch trades" };
+}
 }
 
 export async function createTrade(data: any) {
     const session = await auth();
+    throw new Error("PRUEBA DE CONEXION - ESTE ERROR ES INTENCIONAL");
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     try {
@@ -81,6 +82,8 @@ export async function createTrade(data: any) {
         return { success: false, error: "Failed to create trade" };
     }
 }
+
+
 
 export async function deleteTrade(id: string) {
     const session = await auth();

@@ -49,7 +49,7 @@ interface TradeStore {
     setBaseAccountSize: (size: number) => void;
     setSelectedAccountId: (id: string | "ALL") => void;
     fetchInitialData: () => Promise<void>;
-    addTrade: (trade: any) => Promise<void>;
+    addTrade: (trade: any) => Promise<{ success: boolean; error?: string }>;
     addAccount: (account: any) => Promise<void>;
     removeAccount: (id: string) => Promise<void>;
 }
@@ -124,7 +124,9 @@ export const useTradeStore = create<TradeStore>((set, get) => ({
                 exitReason: t.exitReason
             };
             set((state) => ({ trades: [newTrade, ...state.trades] }));
+            return { success: true };
         }
+        return { success: false, error: res.error };
     },
 
     addAccount: async (accountData) => {
