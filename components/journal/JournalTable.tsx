@@ -17,6 +17,12 @@ export function JournalTable() {
 
     return (
         <Card className="overflow-hidden p-0">
+            {/* DEBUG INFO - REMOVE LATER */}
+            <div className="p-2 bg-red-900/50 text-[10px] text-white font-mono break-all">
+                DEBUG MSG: Trades in Store: {trades.length} |
+                Last: {trades[0] ? JSON.stringify(trades[0].date) : "None"}
+            </div>
+
             <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm whitespace-nowrap">
                     <thead>

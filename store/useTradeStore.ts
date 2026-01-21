@@ -75,7 +75,7 @@ export const useTradeStore = create<TradeStore>((set, get) => ({
             if (tradesRes.success && tradesRes.data) {
                 const formattedTrades = tradesRes.data.map((t: any) => ({
                     ...t,
-                    date: t.date.toISOString(),
+                    date: new Date(t.date).toISOString(),
                     direction: t.direction as 'Long' | 'Short',
                     result: t.result as 'Win' | 'Loss' | 'Breakeven',
                     tags: t.tags ? t.tags.split(',') : [],
@@ -109,7 +109,7 @@ export const useTradeStore = create<TradeStore>((set, get) => ({
             const t = res.data;
             const newTrade: Trade = {
                 ...t,
-                date: t.date.toISOString(),
+                date: new Date(t.date).toISOString(),
                 direction: t.direction as 'Long' | 'Short',
                 result: t.result as 'Win' | 'Loss' | 'Breakeven',
                 tags: t.tags ? t.tags.split(',') : [],
