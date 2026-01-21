@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 
 export async function getBackupData() {
     try {
-        const accounts = await prisma.account.findMany();
+        const accounts = await prisma.tradingAccount.findMany();
         const trades = await prisma.trade.findMany();
         return { success: true, data: { accounts, trades } };
     } catch (error) {
@@ -30,17 +30,18 @@ export async function importData(jsonData: { accounts: any[], trades: any[] }) {
             // Vamos a asumir modo "Restauración Completa": Borrar todo e insertar.
 
             await tx.trade.deleteMany();
-            await tx.account.deleteMany();
+            await tx.tradingAccount.deleteMany();
 
             // 2. Insertar Cuentas
             for (const acc of jsonData.accounts) {
-                await tx.account.create({
+                await tx.tradingAccount.create({
                     data: {
                         id: acc.id, // Mantener ID original para preservar relaciones
                         name: acc.name,
                         balance: acc.balance,
                         type: acc.type,
                         firm: acc.firm,
+                        userId: acc.userId, // Importante: restaurar ownership
                         createdAt: acc.createdAt ? new Date(acc.createdAt) : undefined,
                         updatedAt: acc.updatedAt ? new Date(acc.updatedAt) : undefined,
                     }
@@ -65,6 +66,7 @@ export async function importData(jsonData: { accounts: any[], trades: any[] }) {
                         notes: trade.notes,
                         screenshotUrl: trade.screenshotUrl,
                         accountId: trade.accountId, // Relación directa por ID
+                        userId: trade.userId, // Importante: restaurar ownership
                         createdAt: trade.createdAt ? new Date(trade.createdAt) : undefined,
                         updatedAt: trade.updatedAt ? new Date(trade.updatedAt) : undefined,
                     }
