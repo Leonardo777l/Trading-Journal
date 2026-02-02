@@ -8,11 +8,14 @@ import { TradingCalendar } from "@/components/dashboard/TradingCalendar";
 export default function Home() {
   return (
     <div className="max-w-7xl mx-auto">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-white tracking-tight">
-          Bienvenido, <span className="text-neon-blue">Trader</span>
-        </h1>
-        <p className="text-white/50 mt-2">Aquí tienes el resumen de tu portafolio hoy.</p>
+      <header className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white tracking-tight">
+            Bienvenido, <span className="text-neon-blue">Trader</span>
+          </h1>
+          <p className="text-white/50 mt-2">Aquí tienes el resumen de tu portafolio hoy.</p>
+        </div>
+        <img src="/images/trader_cat.png" alt="Trader Cat" className="w-24 h-24 rounded-full border-2 border-neon-blue shadow-[0_0_15px_rgba(0,224,255,0.3)] object-cover" />
       </header>
 
       <DashboardControls />
