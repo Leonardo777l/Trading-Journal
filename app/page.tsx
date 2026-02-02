@@ -1,42 +1,70 @@
-import { DashboardControls } from "@/components/dashboard/DashboardControls";
-import { StatsCards } from "@/components/dashboard/StatsCards";
-import { AIAnalyst } from "@/components/dashboard/AIAnalyst";
-import { EquityChart } from "@/components/dashboard/EquityChart";
-import { DailyPnLChart } from "@/components/dashboard/DailyPnLChart";
-import { TradingCalendar } from "@/components/dashboard/TradingCalendar";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
+import { Loader2, LogOut } from "lucide-react";
 
 export default function Home() {
+  const { user, isLoading } = useAuthStore();
+  const router = useRouter();
+  const supabase = createClient();
+  const [isSignOutLoading, setIsSignOutLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
+
+  const handleSignOut = async () => {
+    setIsSignOutLoading(true);
+    await supabase.auth.signOut();
+    router.push("/login");
+    setIsSignOutLoading(false);
+  };
+
+  if (isLoading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-7xl mx-auto">
-      <header className="mb-8 flex items-center justify-between">
+    <main className="min-h-screen bg-[#0a0a0a] p-8">
+      <header className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">
-            Bienvenido, <span className="text-neon-blue">Trader</span>
-          </h1>
-          <p className="text-white/50 mt-2">Aquí tienes el resumen de tu portafolio hoy.</p>
+          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+          <p className="text-gray-400">Welcome back, {user.user_metadata?.full_name || user.email}</p>
         </div>
-        <img src="/images/trader_cat.png" alt="Trader Cat" className="w-24 h-24 rounded-full border-2 border-neon-blue shadow-[0_0_15px_rgba(0,224,255,0.3)] object-cover" />
+        <Button
+          variant="outline"
+          className="border-red-500/20 text-red-500 hover:bg-red-500/10"
+          onClick={handleSignOut}
+          disabled={isSignOutLoading}
+        >
+          {isSignOutLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4 mr-2" />}
+          Sign Out
+        </Button>
       </header>
 
-      <DashboardControls />
-      <StatsCards />
-
-      <div className="mb-8">
-        <AIAnalyst />
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Placeholder Metrics */}
+        {["Balance", "Profit", "Win Rate", "Trades"].map((metric) => (
+          <div key={metric} className="rounded-lg border border-[#1e1e1e] bg-[#121212] p-6 shado-sm">
+            <h3 className="text-sm font-medium text-gray-400">{metric}</h3>
+            <p className="mt-2 text-2xl font-bold text-white">--</p>
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2">
-          <EquityChart />
-        </div>
-        <div>
-          <DailyPnLChart />
-        </div>
+      <div className="mt-8 rounded-lg border border-[#1e1e1e] bg-[#121212] p-6 h-64 flex items-center justify-center text-gray-500 border-dashed">
+        Chart Area (Equity Curve)
       </div>
-
-      <div className="h-[500px]">
-        <TradingCalendar />
-      </div>
-    </div>
+    </main>
   );
 }

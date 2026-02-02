@@ -1,24 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
-import { Sidebar } from "@/components/layout/Sidebar";
-
-import { DataInitializer } from "@/components/DataInitializer";
-import { Providers } from "@/components/Providers";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Neon Void Trading Journal",
-  description: "Professional Trading Journal",
+  title: "Ultimate Prop-Trader Journal",
+  description: "Advanced analytics for funded traders.",
 };
 
 export default function RootLayout({
@@ -27,17 +23,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground flex min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          <Sidebar />
-          <main className="flex-1 ml-20 md:ml-64 p-8 overflow-y-auto h-screen">
-            <DataInitializer />
-            {children}
-          </main>
-        </Providers>
+        import {AuthProvider} from "@/components/AuthProvider";
+
+        // ... inside RootLayout ...
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
