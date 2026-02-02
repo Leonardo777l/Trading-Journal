@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Loader2, LogOut } from "lucide-react";
+import { AccountList } from "@/components/accounts/AccountList";
+import { CreateAccountDialog } from "@/components/accounts/CreateAccountDialog";
 
 export default function Home() {
   const { user, isLoading } = useAuthStore();
@@ -52,7 +54,16 @@ export default function Home() {
         </Button>
       </header>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* Account Management Section */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-white">Your Accounts</h2>
+          <CreateAccountDialog />
+        </div>
+        <AccountList />
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
         {/* Placeholder Metrics */}
         {["Balance", "Profit", "Win Rate", "Trades"].map((metric) => (
           <div key={metric} className="rounded-lg border border-[#1e1e1e] bg-[#121212] p-6 shado-sm">
@@ -62,7 +73,7 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="mt-8 rounded-lg border border-[#1e1e1e] bg-[#121212] p-6 h-64 flex items-center justify-center text-gray-500 border-dashed">
+      <div className="rounded-lg border border-[#1e1e1e] bg-[#121212] p-6 h-64 flex items-center justify-center text-gray-500 border-dashed">
         Chart Area (Equity Curve)
       </div>
     </main>

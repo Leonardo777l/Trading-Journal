@@ -13,6 +13,7 @@ interface JournalState {
     activeAccountId: string | null
     isLoading: boolean
     setAccounts: (accounts: TradeAccount[]) => void
+    addAccount: (account: TradeAccount) => void
     setActiveAccount: (id: string) => void
 }
 
@@ -21,5 +22,6 @@ export const useJournalStore = create<JournalState>((set) => ({
     activeAccountId: null,
     isLoading: false,
     setAccounts: (accounts) => set({ accounts }),
+    addAccount: (account) => set((state) => ({ accounts: [...state.accounts, account] })),
     setActiveAccount: (id) => set({ activeAccountId: id }),
 }))
