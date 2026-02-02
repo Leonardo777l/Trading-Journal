@@ -10,34 +10,55 @@ import { auth } from "@/auth";
 
 export async function getTrades() {
     const session = await auth();
-    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+    let userId = session?.user?.id;
+
+    // Fallback for Admin
+    if (!userId && session?.user?.email) {
+        const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+        if (user) userId = user.id;
+    }
+
+    if (!userId) return { success: false, error: "Unauthorized" };
 
     try {
         const trades = await prisma.trade.findMany({
-            where: { userId: session.user.id },
+            where: { userId: userId },
             orderBy: { date: 'desc' },
             include: { account: true }
         });
         return { success: true, data: trades };
     } catch (error) {
         console.error("Error fetching trades:", error);
-        // logToDebugFile is likely not defined, commenting it out to be safe to avoid next error
-        // logToDebugFile(`Error fetching trades: ${String(error)}`);
         return { success: false, error: "Failed to fetch trades" };
     }
 }
 
 export async function createTrade(data: any) {
     const session = await auth();
+    console.log("DEBUG: createTrade Session:", JSON.stringify(session, null, 2));
 
-    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+    let userId = session?.user?.id;
+
+    // Fallback: If ID is missing but email is present (Admin fallback)
+    if (!userId && session?.user?.email) {
+        console.log("DEBUG: ID missing, looking up user by email:", session.user.email);
+        const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+        if (user) {
+            userId = user.id;
+        }
+    }
+
+    if (!userId) {
+        console.error("DEBUG: Unauthorized access attempt. Session:", session);
+        return { success: false, error: "Unauthorized: No User ID found" };
+    }
 
     try {
         let accountId = data.accountId;
 
         if (!accountId && data.account) {
             const account = await prisma.tradingAccount.findFirst({
-                where: { name: data.account, userId: session.user.id }
+                where: { name: data.account, userId: userId }
             });
             if (account) {
                 accountId = account.id;
@@ -47,7 +68,7 @@ export async function createTrade(data: any) {
                         name: data.account,
                         balance: 10000,
                         type: "Personal",
-                        userId: session.user.id
+                        userId: userId!
                     }
                 });
                 accountId = newAccount.id;
@@ -69,7 +90,7 @@ export async function createTrade(data: any) {
                 notes: data.notes,
                 screenshotUrl: data.screenshotUrl,
                 accountId: accountId,
-                userId: session.user.id,
+                userId: userId!,
                 // New Fields
                 entryPrice: data.entryPrice ? Number(data.entryPrice) : null,
                 exitPrice: data.exitPrice ? Number(data.exitPrice) : null,
@@ -93,11 +114,19 @@ export async function createTrade(data: any) {
 
 export async function deleteTrade(id: string) {
     const session = await auth();
-    if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+    let userId = session?.user?.id;
+
+    // Fallback for Admin
+    if (!userId && session?.user?.email) {
+        const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+        if (user) userId = user.id;
+    }
+
+    if (!userId) return { success: false, error: "Unauthorized" };
 
     try {
         const trade = await prisma.trade.findFirst({
-            where: { id, userId: session.user.id }
+            where: { id, userId: userId }
         });
         if (!trade) return { success: false, error: "Trade not found or unauthorized" };
 
