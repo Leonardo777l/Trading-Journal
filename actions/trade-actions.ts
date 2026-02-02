@@ -23,7 +23,7 @@ try {
 
 export async function createTrade(data: any) {
     const session = await auth();
-    throw new Error("PRUEBA DE CONEXION - ESTE ERROR ES INTENCIONAL");
+
     if (!session?.user?.id) return { success: false, error: "Unauthorized" };
 
     try {
