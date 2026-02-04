@@ -8,6 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Loader2, LogOut } from "lucide-react";
 import { AccountList } from "@/components/accounts/AccountList";
 import { CreateAccountDialog } from "@/components/accounts/CreateAccountDialog";
+import { TradeList } from "@/components/journal/TradeList";
+
+import { StatsGrid } from "@/components/stats/StatsGrid";
+import { EquityChart } from "@/components/stats/EquityChart";
+import { MonthlyAnalysis } from "@/components/stats/MonthlyAnalysis";
 
 export default function Home() {
   const { user, isLoading } = useAuthStore();
@@ -63,19 +68,15 @@ export default function Home() {
         <AccountList />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        {/* Placeholder Metrics */}
-        {["Balance", "Profit", "Win Rate", "Trades"].map((metric) => (
-          <div key={metric} className="rounded-lg border border-[#1e1e1e] bg-[#121212] p-6 shado-sm">
-            <h3 className="text-sm font-medium text-gray-400">{metric}</h3>
-            <p className="mt-2 text-2xl font-bold text-white">--</p>
-          </div>
-        ))}
+      <StatsGrid />
+
+      <div className="grid gap-6 md:grid-cols-3 mb-8">
+        <EquityChart />
+        <MonthlyAnalysis />
       </div>
 
-      <div className="rounded-lg border border-[#1e1e1e] bg-[#121212] p-6 h-64 flex items-center justify-center text-gray-500 border-dashed">
-        Chart Area (Equity Curve)
-      </div>
+      {/* Journal Section */}
+      <TradeList />
     </main>
   );
 }

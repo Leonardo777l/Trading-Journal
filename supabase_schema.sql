@@ -42,7 +42,11 @@ create table public.trades (
   entry_price numeric,
   exit_price numeric,
   
-  pnl_currency numeric not null,
+  lot_size numeric,
+  commission numeric default 0,
+  gross_pnl numeric not null,
+  net_pnl numeric generated always as (gross_pnl - commission) stored,
+  
   pnl_percentage numeric,
   
   setup_tags text[], -- Array of strings for strategies
@@ -87,3 +91,10 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- SYNC: Insert missing profiles for existing users
+-- Run this if resetting the database while users already exist in auth.users
+insert into public.profiles (id, email, username)
+select id, email, raw_user_meta_data->>'full_name'
+from auth.users
+on conflict (id) do nothing;
