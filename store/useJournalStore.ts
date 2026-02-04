@@ -4,7 +4,8 @@ export interface TradeAccount {
     id: string
     name: string
     type: 'Challenge' | 'Funded' | 'Personal'
-    balance: number
+    initial_balance: number
+    current_balance: number
     daily_drawdown_limit: number
 }
 

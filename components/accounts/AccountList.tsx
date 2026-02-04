@@ -55,13 +55,13 @@ export function AccountList() {
                         <div className="flex justify-between items-start">
                             <CardTitle className="text-base font-medium text-white">{account.name}</CardTitle>
                             <span className={`px-2 py-0.5 text-xs rounded-full border ${account.type === 'Funded' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                                    account.type === 'Challenge' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                                        'bg-gray-500/10 text-gray-500 border-gray-500/20'
+                                account.type === 'Challenge' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                                    'bg-gray-500/10 text-gray-500 border-gray-500/20'
                                 }`}>
                                 {account.type}
                             </span>
                         </div>
-                        <CardDescription>${account.balance.toLocaleString()}</CardDescription>
+                        <CardDescription>${account.current_balance.toLocaleString()}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-2 text-sm">
